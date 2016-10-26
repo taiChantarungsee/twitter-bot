@@ -1,10 +1,10 @@
 # twitter-bot
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure app that will automatically tweet a selection of lines. Used following tutorial: https://howistart.org/posts/clojure/1, which I recommend, but will modify significantly as I play around with clojure. The twitter account is: https://twitter.com/Quasimodomus. 'profiles.clj' needs to be filled in with relevatn twitter account info.
 
 ## Usage
 
-FIXME
+
 
 ## License
 
