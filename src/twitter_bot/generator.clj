@@ -2,7 +2,10 @@
 	(:require [overtone.at-at :as overtone]
 			  [twitter.api.restful :as twitter]
               [twitter.oauth :as twitter-oauth]
-              [environ.core :refer [env]]))
+              [twitter.api.restful]
+              [environ.core :refer [env]])
+	(:import
+   (twitter.callbacks.protocols SyncSingleCallback)))
 
 (defn word-chain [word-transitions]
   (reduce (fn [r t] (merge-with clojure.set/union r
@@ -66,8 +69,9 @@ word-transitions))
         result-text (if (empty? trimmed-to-last-punct)
                       trimmed-to-last-word
                       trimmed-to-last-punct)
-        cleaned-text (clojure.string/replace result-text #"[,| ]$" ".")]
-    (clojure.string/replace cleaned-text #"\"" "'")))
+        cleaned-text (clojure.string/replace result-text #"[,| ]$" ".")
+        add-symbols (clojure.string/replace cleaned-text #"(\A)" "༄ ")]
+    (clojure.string/replace add-symbols #"\"" "'")))
 
 (defn tweet-text []
   (let [text (generate-text (-> prefix-list shuffle first) functional-leary)]
@@ -93,4 +97,13 @@ word-transitions))
   ;; every 8 hours
   (println "Started up")
   (println (tweet-text))
+  (dorun
+      (println 
+      (map extractTweetInfo
+              (statuses-mentions-timeline :oauth-creds my-creds
+                                           :params {:screen-name "abotcalledquest"}
+                                           :callbacks (SyncSingleCallback. 
+                                                               response-return-body
+                                                               response-throw-error
+                                                               exception-rethrow))))))
   (overtone/every (* 1000 60 60 8) #(println (status-update)) my-pool))
